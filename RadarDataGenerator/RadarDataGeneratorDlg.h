@@ -3,7 +3,7 @@
 //
 
 #pragma once
-
+#include "CreateData.h"
 
 // CRadarDataGeneratorDlg dialog
 class CRadarDataGeneratorDlg : public CDialogEx
@@ -24,6 +24,10 @@ public:
 // Implementation
 protected:
 	HICON m_hIcon;
+    CArray<CPoint> m_arrPoint;
+    CCreateData m_createData;
+    CPoint m_circleCenter;
+    CArray<TData> m_data;
 
 	// Generated message map functions
 	virtual BOOL OnInitDialog();
@@ -31,4 +35,7 @@ protected:
 	afx_msg void OnPaint();
 	afx_msg HCURSOR OnQueryDragIcon();
 	DECLARE_MESSAGE_MAP()
+public:
+    afx_msg void OnLButtonDown(UINT nFlags, CPoint point);
+    afx_msg void OnBnClickedOk();
 };

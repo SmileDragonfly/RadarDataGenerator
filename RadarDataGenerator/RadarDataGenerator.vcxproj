@@ -92,7 +92,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_WINDOWS;_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_WINDOWS;_USE_MATH_DEFINES;_DEBUG;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -183,13 +183,18 @@
     </ResourceCompile>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="CommonDefinitions.h" />
+    <ClInclude Include="CommonStructures.h" />
+    <ClInclude Include="CreateData.h" />
     <ClInclude Include="RadarDataGenerator.h" />
     <ClInclude Include="RadarDataGeneratorDlg.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="TestData.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="CreateData.cpp" />
     <ClCompile Include="RadarDataGenerator.cpp" />
     <ClCompile Include="RadarDataGeneratorDlg.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -198,6 +203,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="TestData.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="RadarDataGenerator.rc" />

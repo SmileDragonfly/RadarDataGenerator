@@ -64,6 +64,8 @@ BEGIN_MESSAGE_MAP(CRadarDataGeneratorDlg, CDialogEx)
 	ON_WM_SYSCOMMAND()
 	ON_WM_PAINT()
 	ON_WM_QUERYDRAGICON()
+    ON_WM_LBUTTONDOWN()
+    ON_BN_CLICKED(IDOK, &CRadarDataGeneratorDlg::OnBnClickedOk)
 END_MESSAGE_MAP()
 
 
@@ -142,6 +144,17 @@ void CRadarDataGeneratorDlg::OnPaint()
 	else
 	{
 		CDialogEx::OnPaint();
+        CClientDC dc(this);
+        CRect rc;
+        GetClientRect(&rc);
+        m_circleCenter.x = rc.right / 2;
+        m_circleCenter.y = rc.bottom / 2;
+        rc.left = m_circleCenter.x - 250;
+        rc.top = m_circleCenter.y - 250;
+        rc.right = m_circleCenter.x + 250;
+        rc.bottom = m_circleCenter.y + 250;
+        dc.Ellipse(&rc);
+        dc.SetPixel(m_circleCenter, RGB(0, 0, 0));
 	}
 }
 
@@ -152,3 +165,23 @@ HCURSOR CRadarDataGeneratorDlg::OnQueryDragIcon()
 	return static_cast<HCURSOR>(m_hIcon);
 }
 
+
+
+void CRadarDataGeneratorDlg::OnLButtonDown(UINT nFlags, CPoint point)
+{
+    // TODO: Add your message handler code here and/or call default
+
+    CDialogEx::OnLButtonDown(nFlags, point);
+    point.x = point.x - m_circleCenter.x;
+    point.y = m_circleCenter.y - point.y;
+
+    m_arrPoint.Add(point);
+}
+
+
+void CRadarDataGeneratorDlg::OnBnClickedOk()
+{
+    // TODO: Add your control notification handler code here
+    m_createData.GenerateDataToCSV(L"RadarData.txt", &m_arrPoint, 100);
+    FILE* pFile = fopen("RadarData.txt", "wb");
+}
