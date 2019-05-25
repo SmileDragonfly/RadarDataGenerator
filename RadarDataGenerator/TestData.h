@@ -11,7 +11,6 @@ public:
     // Functions
     void CreateLineData(float azimuth, int numberOfPoint, CArray<TData>* arrData);
     COLORREF* CreateColorArray(int numberOfPoint);
-    COLORREF*  CreateColorArrayForAmplitudeView(int numberOfPoint);
     // Variables
     int m_colorCreationCount;
 };

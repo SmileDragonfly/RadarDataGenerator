@@ -102,14 +102,3 @@ COLORREF * CTestData::CreateColorArray(int numberOfPoint)
 }
 
 
-COLORREF * CTestData::CreateColorArrayForAmplitudeView(int numberOfPoint)
-{
-    COLORREF* pColor = new COLORREF[numberOfPoint];    
-    for (int i = 0; i < numberOfPoint; i++)
-    {
-        pColor[i] = rand() % 255;
-    }
-    return pColor;
-}
-
-
