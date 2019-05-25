@@ -147,14 +147,35 @@ void CRadarDataGeneratorDlg::OnPaint()
         CClientDC dc(this);
         CRect rc;
         GetClientRect(&rc);
-        m_circleCenter.x = rc.right / 2;
-        m_circleCenter.y = rc.bottom / 2;
-        rc.left = m_circleCenter.x - 250;
-        rc.top = m_circleCenter.y - 250;
-        rc.right = m_circleCenter.x + 250;
-        rc.bottom = m_circleCenter.y + 250;
-        dc.Ellipse(&rc);
-        dc.SetPixel(m_circleCenter, RGB(0, 0, 0));
+        TData point;
+
+        // Create memory device context
+        CDC memDC;
+        CBitmap bitmap;
+        memDC.CreateCompatibleDC(&dc);
+        bitmap.CreateCompatibleBitmap(&dc, rc.Width(), rc.Height());
+        CBitmap* pOldBitmap = memDC.SelectObject(&bitmap);
+
+        m_circleCenter.x = 250;
+        m_circleCenter.y = 250;
+        rc.left = 0;
+        rc.top = 0;
+        rc.right = 500;
+        rc.bottom = 500;
+
+        memDC.Ellipse(&rc);
+        memDC.SetPixel(m_circleCenter.x, m_circleCenter.y, RGB(0, 0, 0));
+        if (m_data.GetSize() > 0)
+        {
+            for (int i = 0; i < m_data.GetSize(); i++)
+            {
+                point = m_data.GetAt(i);
+                memDC.SetPixel(point.position.x + m_circleCenter.x, m_circleCenter.y - point.position.y, point.color);
+            }
+        }
+        dc.BitBlt(rc.left, rc.top, rc.Width(), rc.Height(), &memDC, 0, 0, SRCCOPY);
+        memDC.SelectObject(pOldBitmap);
+        memDC.DeleteDC();
 	}
 }
 
@@ -182,6 +203,24 @@ void CRadarDataGeneratorDlg::OnLButtonDown(UINT nFlags, CPoint point)
 void CRadarDataGeneratorDlg::OnBnClickedOk()
 {
     // TODO: Add your control notification handler code here
-    m_createData.GenerateDataToCSV(L"RadarData.txt", &m_arrPoint, 100);
-    FILE* pFile = fopen("RadarData.txt", "wb");
+    m_createData.GenerateDataToCSV(L"RadarData.txt", &m_arrPoint, 200);
+    FILE* pFile = _wfopen(L"RadarData.txt", L"rb");
+    if (pFile)
+    {
+        int bRet = 1;
+        int countRead = 0;
+        while (bRet == 1)
+        {
+            TData temp;
+            bRet = fread(&temp, sizeof(TData), 1, pFile);
+            m_data.Add(temp);
+            countRead++;
+            TRACE(L"countRead = %d", countRead);
+        }
+        fclose(pFile);
+        Invalidate();
+        UpdateWindow();
+    }
+    m_arrPoint.RemoveAll();
+    m_arrPoint.FreeExtra();
 }

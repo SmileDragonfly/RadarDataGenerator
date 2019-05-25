@@ -42,7 +42,7 @@ void CTestData::CreateLineData(float azimuth, int numberOfPoint, CArray<TData>* 
     if ((k <= 1)&&(k >= -1))
     {
         float tempx;
-        tempx = (float)500 / (sqrt(1 + k * k));
+        tempx = (float)250 / (sqrt(1 + k * k));
         xOffset = (float)tempx / numberOfPoint;
         if (azimuth > PI_VALUE)
         {
@@ -53,7 +53,7 @@ void CTestData::CreateLineData(float azimuth, int numberOfPoint, CArray<TData>* 
     else
     {
         float tempy;
-        tempy = (float)500 / (sqrt(1 + 1/(k * k)));
+        tempy = (float)250 / (sqrt(1 + 1/(k * k)));
         yOffset = (float)tempy / numberOfPoint;
         if ((azimuth >= (PI_VALUE / 2)) && (azimuth < (3 * PI_VALUE / 2)))
         {
@@ -64,7 +64,7 @@ void CTestData::CreateLineData(float azimuth, int numberOfPoint, CArray<TData>* 
     for (int i = 0; i < numberOfPoint; i++)
     {
         TData currData;
-        if (i * xOffset >= 500)
+        if (i * xOffset >= 250)
         {
             currData.position.x = 0;
         }
@@ -72,7 +72,7 @@ void CTestData::CreateLineData(float azimuth, int numberOfPoint, CArray<TData>* 
         {
             currData.position.x = (int)(i * xOffset);
         }
-        if (i * yOffset >= 500)
+        if (i * yOffset >= 250)
         {
             currData.position.y = 0;
         }

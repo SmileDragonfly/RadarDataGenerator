@@ -14,6 +14,7 @@ CCreateData::~CCreateData()
 void CCreateData::GenerateDataToCSV(CString fileName, CArray<CPoint>* arr, int numberOfPoint)
 {
     FILE* pFile = _wfopen(fileName, L"wb");
+    int countWrite = 0;
     if (!pFile)
     {
         return;
@@ -32,7 +33,7 @@ void CCreateData::GenerateDataToCSV(CString fileName, CArray<CPoint>* arr, int n
         {
             radius = rand() % abs(currPoint.y);
         }
-         
+
         double arc = atan2(currPoint.y, currPoint.x) * 180 / M_PI;
 
         if (arc < 0)
@@ -43,7 +44,7 @@ void CCreateData::GenerateDataToCSV(CString fileName, CArray<CPoint>* arr, int n
         TRACE(L"Arc = %f\n", arc);
         TRACE(L"Radius = %d\n", radius);
 
-        double arcBound = atan(radius / sqrt(pow(currPoint.y, 2) + pow(currPoint.x, 2))) * 180 / M_PI;
+        double arcBound = asin(radius / sqrt(pow(currPoint.y, 2) + pow(currPoint.x, 2))) * 180 / M_PI;
         double arcOff = 1;
         TRACE(L"ArcBound = %f\n", arcBound);
 
@@ -56,13 +57,23 @@ void CCreateData::GenerateDataToCSV(CString fileName, CArray<CPoint>* arr, int n
 
         for (int i = 0; i < count; i++)
         {
-            m_testData.CreateLineData(currArc, numberOfPoint, &shapeLineData[i]);
+            if ((90 - currArc) > 0)
+            {
+                m_testData.CreateLineData(90 - currArc, numberOfPoint, &shapeLineData[i]);
+            }
+            else
+            {
+                m_testData.CreateLineData(90 - currArc + 360, numberOfPoint, &shapeLineData[i]);
+            }
             CString strWriteToFile;
             // Remove all point outside the circle
             for (int j = 0; j < shapeLineData[i].GetSize(); j++)
             {
                 TData currData = shapeLineData[i].GetAt(j);
-                if ((pow(currData.position.x - currPoint.x, 2) + pow(currData.position.y - currPoint.y, 2)) > pow(radius, 2))
+                float a = pow(currData.position.x - currPoint.x, 2);
+                float b = pow(currData.position.y - currPoint.y, 2);
+                float c = pow(radius, 2);
+                if ((a + b) > c)
                 {
                     TRACE(L"Remove point = (%d,%d)\n", currData.position.x, currData.position.y);
                     shapeLineData[i].RemoveAt(j);
@@ -71,16 +82,20 @@ void CCreateData::GenerateDataToCSV(CString fileName, CArray<CPoint>* arr, int n
                 }
                 else
                 {
-                    CString strtemp;
-                    strtemp.Format(L"%f;%d;%d;%d\r\n", currArc, currData.position.x, currData.position.y, currData.color);
-                    strWriteToFile += strtemp;
+                    //CString strtemp;
+                    //strtemp.Format(L"%f;%d;%d;%d\r\n", currArc, currData.position.x, currData.position.y, currData.color);
+                    //strWriteToFile += strtemp;
+                    fwrite(&currData, sizeof(TData), 1, pFile);
+                    countWrite++;
                 }
             }
             shapeData.Add(&shapeLineData[i]);
             currArc = currArc + arcOff;
             TRACE(L"currArc = %f\n", currArc);
-            fwrite(strWriteToFile, sizeof(wchar_t), strWriteToFile.GetLength(), pFile);
+            //fwrite(strWriteToFile, sizeof(wchar_t), strWriteToFile.GetLength(), pFile);
         }
     }
+    TRACE(L"times write to file = %d\n", countWrite);
     fclose(pFile);
+    pFile = NULL;
 }
