@@ -28,6 +28,7 @@ protected:
     CCreateData m_createData;
     CPoint m_circleCenter;
     CArray<TData> m_data;
+    int m_currentDrawPoint;
 
 	// Generated message map functions
 	virtual BOOL OnInitDialog();

@@ -11,14 +11,8 @@ CCreateData::~CCreateData()
 {
 }
 
-void CCreateData::GenerateDataToCSV(CString fileName, CArray<CPoint>* arr, int numberOfPoint)
+void CCreateData::GenerateData(CArray<CPoint>* arr, int numberOfPoint, CArray<TData>* arrData)
 {
-    FILE* pFile = _wfopen(fileName, L"wb");
-    int countWrite = 0;
-    if (!pFile)
-    {
-        return;
-    }
     for (int i = 0; i < arr->GetSize(); i++)
     {
         CArray<CArray<TData>*> shapeData;
@@ -82,20 +76,22 @@ void CCreateData::GenerateDataToCSV(CString fileName, CArray<CPoint>* arr, int n
                 }
                 else
                 {
-                    //CString strtemp;
-                    //strtemp.Format(L"%f;%d;%d;%d\r\n", currArc, currData.position.x, currData.position.y, currData.color);
-                    //strWriteToFile += strtemp;
-                    fwrite(&currData, sizeof(TData), 1, pFile);
-                    countWrite++;
+                    arrData->Add(currData);
                 }
             }
-            shapeData.Add(&shapeLineData[i]);
             currArc = currArc + arcOff;
             TRACE(L"currArc = %f\n", currArc);
-            //fwrite(strWriteToFile, sizeof(wchar_t), strWriteToFile.GetLength(), pFile);
         }
     }
-    TRACE(L"times write to file = %d\n", countWrite);
-    fclose(pFile);
-    pFile = NULL;
+}
+
+void CCreateData::SaveDataToCSV(FILE * pFile, CArray<TData>* arrData)
+{
+    for (int i = 0; i < arrData->GetSize(); i++)
+    {
+        TData currData = arrData->GetAt(i);
+        CString strWrite;
+        strWrite.Format(L"%d,%d,%d\r\n", currData.position.x, currData.position.y, currData.color);
+        fwrite(strWrite, sizeof(wchar_t), strWrite.GetLength(), pFile);
+    }
 }

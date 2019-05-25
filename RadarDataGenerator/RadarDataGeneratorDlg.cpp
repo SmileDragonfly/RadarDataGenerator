@@ -53,6 +53,7 @@ CRadarDataGeneratorDlg::CRadarDataGeneratorDlg(CWnd* pParent /*=nullptr*/)
 	: CDialogEx(IDD_RADARDATAGENERATOR_DIALOG, pParent)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
+    m_currentDrawPoint = 0;
 }
 
 void CRadarDataGeneratorDlg::DoDataExchange(CDataExchange* pDX)
@@ -162,16 +163,20 @@ void CRadarDataGeneratorDlg::OnPaint()
         rc.top = 0;
         rc.right = 500;
         rc.bottom = 500;
-
-        memDC.Ellipse(&rc);
-        memDC.SetPixel(m_circleCenter.x, m_circleCenter.y, RGB(0, 0, 0));
         if (m_data.GetSize() > 0)
         {
+            memDC.Ellipse(&rc);
+            memDC.SetPixel(m_circleCenter.x, m_circleCenter.y, RGB(0, 0, 0));
             for (int i = 0; i < m_data.GetSize(); i++)
             {
                 point = m_data.GetAt(i);
                 memDC.SetPixel(point.position.x + m_circleCenter.x, m_circleCenter.y - point.position.y, point.color);
             }
+        }
+        else
+        {
+            memDC.Ellipse(&rc);
+            memDC.SetPixel(m_circleCenter.x, m_circleCenter.y, RGB(0, 0, 0));
         }
         dc.BitBlt(rc.left, rc.top, rc.Width(), rc.Height(), &memDC, 0, 0, SRCCOPY);
         memDC.SelectObject(pOldBitmap);
@@ -197,30 +202,22 @@ void CRadarDataGeneratorDlg::OnLButtonDown(UINT nFlags, CPoint point)
     point.y = m_circleCenter.y - point.y;
 
     m_arrPoint.Add(point);
+
+    m_createData.GenerateData(&m_arrPoint, 200, &m_data);
+    Invalidate();
+    UpdateWindow();
+    m_arrPoint.RemoveAll();
+    m_arrPoint.FreeExtra();
 }
 
 
 void CRadarDataGeneratorDlg::OnBnClickedOk()
 {
     // TODO: Add your control notification handler code here
-    m_createData.GenerateDataToCSV(L"RadarData.txt", &m_arrPoint, 200);
-    FILE* pFile = _wfopen(L"RadarData.txt", L"rb");
-    if (pFile)
-    {
-        int bRet = 1;
-        int countRead = 0;
-        while (bRet == 1)
-        {
-            TData temp;
-            bRet = fread(&temp, sizeof(TData), 1, pFile);
-            m_data.Add(temp);
-            countRead++;
-            TRACE(L"countRead = %d", countRead);
-        }
-        fclose(pFile);
-        Invalidate();
-        UpdateWindow();
-    }
-    m_arrPoint.RemoveAll();
-    m_arrPoint.FreeExtra();
+    FILE* pFile = fopen("RADARDATA.csv", "wb");
+    m_createData.SaveDataToCSV(pFile, &m_data);
+    fclose(pFile);
+    AfxMessageBox(L"Data is stored to RADARDATA.csv");
+    m_data.RemoveAll();
+    m_data.FreeExtra();
 }
